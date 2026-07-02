@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en" class="h-full scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aegis Lite | FED Assignment</title>
+  <meta name="description" content="A beginner-friendly investment dashboard prototype built with HTML, Tailwind CSS, and vanilla JavaScript.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' };
+  </script>
+</head>
+<body class="h-full bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+  <div class="min-h-full bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.12),_transparent_34%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.12),_transparent_28%)] dark:bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_transparent_34%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.14),_transparent_28%)]">
+    <header class="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/80">
+      <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.3em] text-blue-600 dark:text-cyan-300">FED Assignment</p>
+          <h1 class="text-2xl font-bold tracking-tight sm:text-3xl">Aegis Lite</h1>
+        </div>
+        <button id="theme-toggle" type="button" class="inline-flex items-center gap-2 rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-500 hover:text-blue-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-cyan-400 dark:hover:text-cyan-300" aria-pressed="false">
+          <span id="theme-toggle-label">Dark mode</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <section class="grid gap-6 rounded-3xl border border-slate-200 bg-white/85 p-6 shadow-sm shadow-slate-200/60 dark:border-slate-800 dark:bg-slate-900/75 dark:shadow-slate-950/40 lg:grid-cols-[1.4fr_0.9fr] lg:p-8">
+        <div class="space-y-5">
+          <p class="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-blue-700 dark:bg-cyan-500/15 dark:text-cyan-300">Beginner-friendly dashboard prototype</p>
+          <div class="space-y-3">
+            <h2 class="max-w-2xl text-4xl font-black tracking-tight text-slate-950 dark:text-white sm:text-5xl">Learn the basics of investing without the pressure.</h2>
+            <p class="max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300">Aegis Lite lets students search a stock symbol, save a watchlist, test a simple signal, and explore how a portfolio might be split across assets.</p>
+          </div>
+          <div class="flex flex-wrap gap-3 text-sm">
+            <a href="#quote-search" class="rounded-full bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200">Try the quote search</a>
+            <a href="#about" class="rounded-full border border-slate-300 px-5 py-3 font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">Read the disclaimer</a>
+          </div>
+        </div>
+
+        <aside class="grid gap-3 rounded-2xl bg-slate-50 p-5 dark:bg-slate-950/60">
+          <div class="rounded-2xl bg-slate-950 p-4 text-white shadow-lg shadow-slate-950/20 dark:bg-slate-900">
+            <p class="text-sm text-slate-300">Sample focus asset</p>
+            <p class="mt-1 text-3xl font-bold">AAPL</p>
+            <p class="mt-2 text-sm text-emerald-300">Demo data updates from the Vercel API route.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div class="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+              <p class="text-slate-500 dark:text-slate-400">Watchlist</p>
+              <p id="watchlist-count" class="mt-2 text-2xl font-bold">0</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+              <p class="text-slate-500 dark:text-slate-400">Signal</p>
+              <p id="summary-signal" class="mt-2 text-2xl font-bold">Ready</p>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Dashboard summary cards">
+        <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <p class="text-sm text-slate-500 dark:text-slate-400">Latest symbol</p>
+          <p id="card-symbol" class="mt-2 text-2xl font-bold">AAPL</p>
+          <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Search any supported demo symbol.</p>
+        </article>
+        <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <p class="text-sm text-slate-500 dark:text-slate-400">Last price</p>
+          <p id="card-price" class="mt-2 text-2xl font-bold">--</p>
+          <p id="card-change" class="mt-1 text-sm text-slate-600 dark:text-slate-300">Waiting for quote</p>
+        </article>
+        <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <p class="text-sm text-slate-500 dark:text-slate-400">Signal verdict</p>
+          <p id="card-verdict" class="mt-2 text-2xl font-bold">Neutral</p>
+          <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Based on price change percentage.</p>
+        </article>
+        <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <p class="text-sm text-slate-500 dark:text-slate-400">Allocation total</p>
+          <p id="card-allocation" class="mt-2 text-2xl font-bold">100%</p>
+          <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Simple portfolio allocation calculator.</p>
+        </article>
+      </section>
+
+      <section id="quote-search" class="mt-8 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <h2 class="text-2xl font-bold tracking-tight">Quote search</h2>
+              <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Fetch demo market data from the serverless API route.</p>
+            </div>
+            <button id="load-aapl" type="button" class="rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 dark:border-cyan-500/20 dark:bg-cyan-500/10 dark:text-cyan-300 dark:hover:bg-cyan-500/20">Load AAPL</button>
+          </div>
+
+          <form id="quote-form" class="mt-6 grid gap-3 sm:grid-cols-[1fr_auto]" novalidate>
+            <div>
+              <label for="symbol-input" class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">Stock symbol</label>
+              <input id="symbol-input" name="symbol" type="text" inputmode="latin" autocomplete="off" value="AAPL" class="w-full rounded-2xl border border-slate-300 bg-transparent px-4 py-3 uppercase tracking-[0.15em] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:border-slate-700 dark:focus:border-cyan-400 dark:focus:ring-cyan-500/10" aria-describedby="quote-help quote-status">
+              <p id="quote-help" class="mt-2 text-xs text-slate-500 dark:text-slate-400">Supported demos: AAPL, MSFT, TSLA, NVDA, SPY, QQQ.</p>
+            </div>
+            <div class="flex items-end">
+              <button type="submit" class="w-full rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700 dark:bg-cyan-500 dark:text-slate-950 dark:hover:bg-cyan-400">Search quote</button>
+            </div>
+          </form>
+
+          <div id="quote-status" role="status" aria-live="polite" class="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-950/50 dark:text-slate-300">Enter a symbol to load a quote.</div>
+
+          <div id="quote-panel" class="mt-4 hidden rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950/60">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p id="quote-name" class="text-sm font-medium uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">Apple Inc.</p>
+                <h3 id="quote-symbol" class="mt-1 text-3xl font-black">AAPL</h3>
+              </div>
+              <button id="watchlist-button" type="button" class="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold transition hover:border-blue-500 hover:text-blue-600 dark:border-slate-700 dark:hover:border-cyan-400 dark:hover:text-cyan-300">Add to watchlist</button>
+            </div>
+
+            <dl class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div class="rounded-2xl bg-white p-4 dark:bg-slate-900">
+                <dt class="text-sm text-slate-500 dark:text-slate-400">Price</dt>
+                <dd id="quote-price" class="mt-2 text-2xl font-bold">--</dd>
+              </div>
+              <div class="rounded-2xl bg-white p-4 dark:bg-slate-900">
+                <dt class="text-sm text-slate-500 dark:text-slate-400">Change</dt>
+                <dd id="quote-change" class="mt-2 text-2xl font-bold">--</dd>
+              </div>
+              <div class="rounded-2xl bg-white p-4 dark:bg-slate-900">
+                <dt class="text-sm text-slate-500 dark:text-slate-400">Change %</dt>
+                <dd id="quote-change-pct" class="mt-2 text-2xl font-bold">--</dd>
+              </div>
+              <div class="rounded-2xl bg-white p-4 dark:bg-slate-900">
+                <dt class="text-sm text-slate-500 dark:text-slate-400">Source</dt>
+                <dd id="quote-source" class="mt-2 text-lg font-semibold">API demo</dd>
+              </div>
+            </dl>
+          </div>
+        </article>
+
+        <aside class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 class="text-2xl font-bold tracking-tight">Watchlist</h2>
+          <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Saved symbols stay after refresh using localStorage.</p>
+          <ul id="watchlist" class="mt-5 space-y-3" aria-label="Saved stock symbols"></ul>
+          <p id="watchlist-empty" class="mt-5 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-950/50 dark:text-slate-400">No symbols saved yet.</p>
+        </aside>
+      </section>
+
+      <section class="mt-8 grid gap-6 lg:grid-cols-2">
+        <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 class="text-2xl font-bold tracking-tight">Strategy signal demo</h2>
+          <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">This is an educational example, not financial advice.</p>
+          <div class="mt-5 space-y-4">
+            <label for="threshold-input" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Buy threshold percentage</label>
+            <input id="threshold-input" type="range" min="1" max="10" value="3" class="w-full accent-blue-600 dark:accent-cyan-400" aria-describedby="signal-status">
+            <div class="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
+              <span>1%</span>
+              <span id="threshold-value" class="font-semibold text-slate-700 dark:text-slate-200">3%</span>
+              <span>10%</span>
+            </div>
+          </div>
+          <div id="signal-status" role="status" aria-live="polite" class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-200">Load a quote to see the signal.</div>
+        </article>
+
+        <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 class="text-2xl font-bold tracking-tight">Portfolio calculator</h2>
+          <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Allocate 100% across three simple buckets.</p>
+
+          <form id="allocation-form" class="mt-5 grid gap-4 sm:grid-cols-3" novalidate>
+            <div>
+              <label for="growth-input" class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">Growth %</label>
+              <input id="growth-input" type="number" min="0" max="100" value="50" class="w-full rounded-2xl border border-slate-300 bg-transparent px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:border-slate-700 dark:focus:border-cyan-400 dark:focus:ring-cyan-500/10">
+            </div>
+            <div>
+              <label for="income-input" class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">Income %</label>
+              <input id="income-input" type="number" min="0" max="100" value="30" class="w-full rounded-2xl border border-slate-300 bg-transparent px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:border-slate-700 dark:focus:border-cyan-400 dark:focus:ring-cyan-500/10">
+            </div>
+            <div>
+              <label for="cash-input" class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">Cash %</label>
+              <input id="cash-input" type="number" min="0" max="100" value="20" class="w-full rounded-2xl border border-slate-300 bg-transparent px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:border-slate-700 dark:focus:border-cyan-400 dark:focus:ring-cyan-500/10">
+            </div>
+          </form>
+
+          <button id="calculate-allocation" type="button" class="mt-4 rounded-2xl bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200">Calculate allocation</button>
+
+          <div class="mt-5 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
+            <div class="grid grid-cols-[1fr_auto] gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium dark:border-slate-800 dark:bg-slate-950/60">
+              <span>Bucket</span>
+              <span>Value</span>
+            </div>
+            <div class="grid grid-cols-[1fr_auto] gap-3 px-4 py-3 text-sm">
+              <span>Growth</span>
+              <span id="growth-result" class="font-semibold">50%</span>
+            </div>
+            <div class="grid grid-cols-[1fr_auto] gap-3 border-t border-slate-200 px-4 py-3 text-sm dark:border-slate-800">
+              <span>Income</span>
+              <span id="income-result" class="font-semibold">30%</span>
+            </div>
+            <div class="grid grid-cols-[1fr_auto] gap-3 border-t border-slate-200 px-4 py-3 text-sm dark:border-slate-800">
+              <span>Cash</span>
+              <span id="cash-result" class="font-semibold">20%</span>
+            </div>
+            <div class="grid grid-cols-[1fr_auto] gap-3 border-t border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold dark:border-slate-800 dark:bg-slate-950/60">
+              <span>Total</span>
+              <span id="allocation-total">100%</span>
+            </div>
+          </div>
+
+          <p id="allocation-message" role="status" aria-live="polite" class="mt-4 text-sm text-slate-600 dark:text-slate-300">The total should equal 100%.</p>
+        </article>
+      </section>
+
+      <section id="about" class="mt-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h2 class="text-2xl font-bold tracking-tight">About / disclaimer</h2>
+        <p class="mt-3 max-w-4xl text-sm leading-7 text-slate-600 dark:text-slate-300">Aegis Lite is a student front-end development project. It uses demo market data, localStorage, and a simple serverless API route to practice UI layout, DOM manipulation, and ES6 JavaScript. It is not connected to a brokerage account and does not place trades.</p>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
