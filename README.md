@@ -54,6 +54,20 @@ If a symbol is not recognized, the API returns safe fallback demo data instead o
 6. As a student, I want to calculate portfolio allocation so I can practice splitting percentages.
 7. As a student, I want to switch between dark and light mode so the dashboard is easier to read.
 
+## Source Code Management Pitch
+
+This repo is intended to show iterative development rather than one large drop. A good batch history for the assignment is:
+
+1. `chore: initialise aegis lite project`
+2. `feat: build responsive dashboard layout`
+3. `feat: add persistent watchlist`
+4. `feat: add quote api integration`
+5. `feat: add signal and portfolio tools`
+6. `chore: polish accessibility and testing documentation`
+7. `docs: add deployment and submission notes`
+
+That style of history supports the Source Code Management Pitch marks because it shows planning, feature delivery, and documentation in separate commits.
+
 ## Figma Prototype Link
 
 Placeholder: https://www.figma.com/file/your-prototype-link-here
@@ -91,6 +105,13 @@ Placeholder: https://www.figma.com/file/your-prototype-link-here
 - Improve allocation feedback with color bars
 - Expand the watchlist with notes or tags
 - Add a small portfolio summary using the saved symbols
+
+## Submission Workflow
+
+1. Keep the Figma, GitHub Pages, and Vercel fields as placeholders until the live links are confirmed.
+2. Verify the app is live on Vercel first, then update the README with the real serverless URL.
+3. Verify the static site on GitHub Pages next, then update the README with the real Pages URL.
+4. After both links are live, make one final documentation commit so the submission proof matches the deployed app.
 
 ## Credits
 
