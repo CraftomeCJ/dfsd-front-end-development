@@ -70,12 +70,12 @@ That style of history supports the Source Code Management Pitch marks because it
 
 ## Figma Prototype Link
 
-Placeholder: https://www.figma.com/file/your-prototype-link-here
+https://www.figma.com/design/fLDlfsIQvHLnYSNJLJrSe4/Aegis-Lite-FED-Prototype?node-id=1-392&t=jzDlH5Z1cL5Um8PN-0
 
 ## Deployment Links
 
-- GitHub Pages: https://your-username.github.io/your-repo-name/
-- Vercel live link: https://your-project-name.vercel.app/
+- GitHub Pages: https://github.com/CraftomeCJ/dfsd-front-end-development/tree/main#
+- Vercel live link: https://vercel.com/new/aegis21/success?auto-redirect=true&developer-id=&external-id=&redirect-url=&branch=main&deploymentUrl=dfsd-front-end-development-ps9husy9x-aegis21.vercel.app&projectName=dfsd-front-end-development&s=https%3A%2F%2Fgithub.com%2FCraftomeCJ%2Fdfsd-front-end-development&gitOrgLimit=&hasTrialAvailable=1&totalProjects=1&flow-id=yltWK5Q5TZppJBhEbvFUz&teamSlug=aegis21
 
 ## Testing Plan
 
