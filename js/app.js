@@ -1,6 +1,54 @@
 const watchlistKey = "aegis-lite-watchlist";
 const themeKey = "aegis-lite-theme";
 
+const vercelApiBaseUrl = "https://dfsd-front-end-development.vercel.app";
+const symbolPattern = /^[A-Z0-9.-]{1,10}$/;
+
+const fallbackQuotes = {
+  AAPL: {
+    symbol: "AAPL",
+    name: "Apple Inc.",
+    price: 214.37,
+    previousClose: 210.12,
+    source: "Offline fallback"
+  },
+  MSFT: {
+    symbol: "MSFT",
+    name: "Microsoft Corp.",
+    price: 468.91,
+    previousClose: 461.44,
+    source: "Offline fallback"
+  },
+  TSLA: {
+    symbol: "TSLA",
+    name: "Tesla, Inc.",
+    price: 241.28,
+    previousClose: 249.65,
+    source: "Offline fallback"
+  },
+  NVDA: {
+    symbol: "NVDA",
+    name: "NVIDIA Corp.",
+    price: 128.54,
+    previousClose: 124.02,
+    source: "Offline fallback"
+  },
+  SPY: {
+    symbol: "SPY",
+    name: "SPDR S&P 500 ETF Trust",
+    price: 546.12,
+    previousClose: 541.45,
+    source: "Offline fallback"
+  },
+  QQQ: {
+    symbol: "QQQ",
+    name: "Invesco QQQ Trust",
+    price: 480.33,
+    previousClose: 476.9,
+    source: "Offline fallback"
+  }
+};
+
 const demoQuotes = {
   AAPL: { symbol: "AAPL", name: "Apple Inc.", price: 214.37, previousClose: 210.12 },
   MSFT: { symbol: "MSFT", name: "Microsoft Corp.", price: 468.91, previousClose: 461.44 },
@@ -112,36 +160,53 @@ function toggleTheme() {
 
 function handleQuoteSearch(event) {
   event.preventDefault();
-  const symbol = elements.symbolInput.value.trim().toUpperCase();
 
-  if (!symbol) {
-    showQuoteStatus("Enter a stock symbol first.", "error");
-    return;
+  try {
+    const symbol = normalizeSymbol(elements.symbolInput.value);
+    loadQuote(symbol);
+  } catch (error) {
+    showQuoteStatus(error.message, "error");
   }
+}
 
-  loadQuote(symbol);
+function getApiBaseUrl() {
+  return window.location.hostname.endsWith("github.io") ? vercelApiBaseUrl : "";
 }
 
 async function loadQuote(symbol) {
-  const normalizedSymbol = symbol.trim().toUpperCase();
+  let normalizedSymbol;
 
-  showQuoteStatus(`Loading quote for ${normalizedSymbol}...`, "loading");
+  try {
+    normalizedSymbol = normalizeSymbol(symbol);
+  } catch (error) {
+    showQuoteStatus(error.message, "error");
+    return;
+  }
+
+  showQuoteStatus(`Loading live quote for ${normalizedSymbol}...`, "loading");
   setQuotePanelLoading(normalizedSymbol);
 
   try {
-    const response = await fetch(`/api/quote?symbol=${encodeURIComponent(normalizedSymbol)}`);
-    const quote = response.ok ? await response.json() : createFallbackQuote(normalizedSymbol);
+    const response = await fetch(
+      `${getApiBaseUrl()}/api/quote?symbol=${encodeURIComponent(normalizedSymbol)}`
+    );
+
+    const payload = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      throw new Error("Fallback demo data used");
+      throw new Error(payload.error || "Quote API error");
     }
 
-    renderQuote(quote, "Live via /api/quote");
-    showQuoteStatus(`Loaded ${quote.symbol} successfully.`, "success");
-  } catch {
+    const quote = normalizeQuote(payload, normalizedSymbol);
+    renderQuote(quote);
+    showQuoteStatus(`Loaded ${quote.symbol} from ${quote.source}.`, "success");
+  } catch (error) {
     const fallbackQuote = createFallbackQuote(normalizedSymbol);
-    renderQuote(fallbackQuote, "Demo fallback");
-    showQuoteStatus(`Could not reach the API. Showing demo data for ${fallbackQuote.symbol}.`, "error");
+    renderQuote(fallbackQuote);
+    showQuoteStatus(
+      `${error.message}. Showing offline fallback data for ${fallbackQuote.symbol}.`,
+      "error"
+    );
   }
 }
 
@@ -151,7 +216,8 @@ function createFallbackQuote(symbol) {
     symbol,
     name: demoQuotes[symbol]?.name ?? `${symbol} Demo Asset`,
     price: demoQuotes[symbol]?.price ?? fallback.price,
-    previousClose: demoQuotes[symbol]?.previousClose ?? fallback.previousClose
+    previousClose: demoQuotes[symbol]?.previousClose ?? fallback.previousClose,
+    source: "Offline fallback"
   };
 }
 
@@ -167,7 +233,7 @@ function setQuotePanelLoading(symbol) {
   elements.watchlistButton.textContent = "Working...";
 }
 
-function renderQuote(quote, sourceLabel) {
+function renderQuote(quote) {
   state.currentQuote = quote;
   elements.quotePanel.classList.remove("hidden");
   elements.quoteName.textContent = quote.name;
@@ -183,7 +249,7 @@ function renderQuote(quote, sourceLabel) {
   elements.quoteChange.className = `mt-2 text-2xl font-bold ${change >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`;
   elements.quoteChangePct.textContent = changePercentText;
   elements.quoteChangePct.className = `mt-2 text-2xl font-bold ${changePercent >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`;
-  elements.quoteSource.textContent = sourceLabel;
+  elements.quoteSource.textContent = quote.source || "Finnhub live API";
   elements.watchlistButton.disabled = false;
   elements.watchlistButton.textContent = isWatchlisted(quote.symbol) ? "Remove from watchlist" : "Add to watchlist";
 
@@ -264,7 +330,7 @@ function isWatchlisted(symbol) {
 }
 
 function renderWatchlist() {
-  elements.watchlist.innerHTML = "";
+  elements.watchlist.replaceChildren();
   elements.watchlistCount.textContent = String(state.watchlist.length);
   elements.watchlistEmpty.classList.toggle("hidden", state.watchlist.length > 0);
 
@@ -278,7 +344,13 @@ function renderWatchlist() {
     item.className = "flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-950/50";
 
     const label = document.createElement("div");
-    label.innerHTML = `<p class="font-semibold">${quote.symbol}</p><p class="text-xs text-slate-500 dark:text-slate-400">${quote.name}</p>`;
+    const symbolLine = document.createElement("p");
+    symbolLine.className = "font-semibold";
+    symbolLine.textContent = quote.symbol;
+    const nameLine = document.createElement("p");
+    nameLine.className = "text-xs text-slate-500 dark:text-slate-400";
+    nameLine.textContent = quote.name;
+    label.append(symbolLine, nameLine);
 
     const controls = document.createElement("div");
     controls.className = "flex items-center gap-2";
@@ -287,6 +359,7 @@ function renderWatchlist() {
     loadButton.type = "button";
     loadButton.className = "rounded-full border border-slate-300 px-3 py-1 text-xs font-semibold transition hover:border-blue-500 hover:text-blue-600 dark:border-slate-700 dark:hover:border-cyan-400 dark:hover:text-cyan-300";
     loadButton.textContent = "Load";
+    loadButton.setAttribute("aria-label", `Load ${quote.symbol} quote`);
     loadButton.addEventListener("click", () => loadQuote(symbol));
 
     const removeButton = document.createElement("button");
@@ -326,12 +399,13 @@ function showQuoteStatus(message, variant) {
 function updateAllocationView() {
   const growth = clampPercent(Number(elements.growthInput.value));
   const income = clampPercent(Number(elements.incomeInput.value));
+  const remainingCash = 100 - growth - income;
   let cash = clampPercent(Number(elements.cashInput.value));
-  const total = growth + income + cash;
 
-  if (total !== 100) {
-    cash = clampPercent(100 - growth - income);
-    elements.cashInput.value = String(cash);
+  if (remainingCash >= 0) {
+    cash = remainingCash;
+  } else {
+    cash = 0;
   }
 
   elements.growthInput.value = String(growth);
@@ -343,10 +417,15 @@ function updateAllocationView() {
   elements.allocationTotal.textContent = `${growth + income + cash}%`;
   elements.cardAllocation.textContent = `${growth + income + cash}%`;
 
-  if (growth + income + cash === 100) {
+  if (remainingCash < 0) {
+    elements.allocationMessage.textContent = `Growth and income total ${growth + income}%, which exceeds 100%. Cash has been set to 0%.`;
+    elements.allocationMessage.className = "mt-4 text-sm text-rose-600 dark:text-rose-300";
+  } else if (growth + income + cash === 100) {
     elements.allocationMessage.textContent = "The allocation is balanced at 100%.";
+    elements.allocationMessage.className = "mt-4 text-sm text-slate-600 dark:text-slate-300";
   } else {
     elements.allocationMessage.textContent = "The app corrected the cash bucket so the total equals 100%.";
+    elements.allocationMessage.className = "mt-4 text-sm text-slate-600 dark:text-slate-300";
   }
 }
 
@@ -360,6 +439,30 @@ function clampPercent(value) {
   }
 
   return Math.round(value);
+}
+
+function normalizeQuote(payload, symbol) {
+  return {
+    symbol: String(payload.symbol || symbol).toUpperCase(),
+    name: String(payload.name || `${symbol} Quote`),
+    price: Number(payload.price),
+    previousClose: Number(payload.previousClose || payload.price),
+    high: Number(payload.high || payload.price),
+    low: Number(payload.low || payload.price),
+    open: Number(payload.open || payload.price),
+    timestamp: Number(payload.timestamp || Math.floor(Date.now() / 1000)),
+    source: String(payload.source || "Finnhub live API")
+  };
+}
+
+function normalizeSymbol(rawSymbol) {
+  const symbol = String(rawSymbol || "").trim().toUpperCase();
+
+  if (!symbolPattern.test(symbol)) {
+    throw new Error("Enter a valid symbol using 1 to 10 letters, numbers, dots, or hyphens.");
+  }
+
+  return symbol;
 }
 
 function formatCurrency(value) {
